@@ -1,0 +1,27 @@
+# Root ignores
+.DS_Store
+.env
+.env.local
+.env.*.local
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Backend
+backend/.venv/
+backend/.mypy_cache/
+backend/.ruff_cache/
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+
+# Tooling
+.idea/
+.vscode/
+*.log
