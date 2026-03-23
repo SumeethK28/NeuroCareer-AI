@@ -1,0 +1,40 @@
+## NeuroCareer Backend
+
+FastAPI + PydanticAI service that powers the NeuroCareer AI mentor. It brokers Groq's `qwen/qwen3-32b`, orchestrates Hindsight memory (retain/recall/reflect), runs APScheduler jobs for proactive reflections, and exposes APIs for the Next.js dashboard.
+
+### Getting started
+
+```bash
+cd backend
+python -m venv .venv && .venv\Scripts\activate
+pip install --upgrade pip
+pip install -e .
+uvicorn app.main:app --reload --port 8000
+```
+
+### Environment variables
+
+Copy `.env.example` to `.env` at the repo root and fill:
+
+| Key | Purpose |
+| --- | --- |
+| `GROQ_API_KEY`, `GROQ_MODEL` | Groq OpenAI-compatible endpoint |
+| `HINDSIGHT_API_KEY`, `HINDSIGHT_BASE_URL`, `HINDSIGHT_BANK_ID` | Hindsight Cloud credentials |
+| `DATABASE_URL` | Async SQLAlchemy DSN |
+| `NEXTAUTH_SECRET`, `JWT_AUDIENCE`, `JWT_ISSUER` | Token verification for GitHub OAuth sessions |
+
+Redeem promo code `MEMHACK315` in the Hindsight billing UI for $50 credits before running retain/reflect at scale.
+
+### Key components
+
+- **`app/services/hindsight_client.py`** – wraps the `hindsight-client` SDK with HTTP fallback.
+- **`app/services/memory.py`** – orchestrates retain/recall, skill tree hydration, application ghosting insights, and "Career Growth Reflect".
+- **`app/agents/career_agent.py`** – PydanticAI agent manager (advisor, resume worker, mock interview) with graceful handling for 429 + ToolCallingError scenarios.
+- **`app/services/reflection.py`** – APScheduler jobs for daily and weekly proactive reflections.
+- **`app/api/routes/*`** – REST surface for agent chat, memory operations, resume uploads, and compliance actions (clear memory).
+
+### Deployment notes
+
+- Package into a Railway-friendly Docker image (Python 3.12 slim). Expose port `8000`.
+- Ensure the Postgres instance (Neon/Supabase/Railway) is reachable via `DATABASE_URL`.
+- Provide the frontend with JWTs signed via `NEXTAUTH_SECRET`. The backend only trusts tokens with `aud=neurocareer-users` and `iss=neurocareer`.
